@@ -1,0 +1,139 @@
+# DNA-Inspired Software Requirements Classifier
+
+[![Python Version](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11-blue.svg)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)]()
+[![Code Style: Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
+A production-grade, bio-inspired machine learning framework that implements the exact methodology described in the research paper **"Bio-Inspired Feature Engineering for Enhanced Software Requirements Classification"**. 
+
+This repository leverages biological metaphors by mapping software requirement classes into genetic DNA bases (A, T, C, G, N) and constructing a hybrid feature space fusing statistical TF-IDF keyword metrics with deep contextual SBERT sentence embeddings.
+
+---
+
+## 🧬 Methodology & Metaphorical Mapping
+
+The framework encodes linguistic requirement rules into DNA-like sequences to build robust feature maps:
+
+### 1. Symbolic DNA Base Target Mapping
+Classes from the **PROMISE NFR dataset** are mapped into genetic bases:
+*   **Adenine (A)**: Functional Requirements (F)
+*   **Thymine (T)**: Usability Requirements (US)
+*   **Guanine (G)**: Performance Requirements (PE)
+*   **Cytosine (C)**: Security Requirements (SE)
+*   **Neutral (N)**: All other Non-Functional Requirements (NFRs)
+
+### 2. Hybrid DNA Feature Fusion
+The input text space is transformed using a dual-strand vectorization approach:
+
+$$\mathbf{X}_{\text{hybrid}} = \left[ \text{TF-IDF}(\mathbf{S}) \;\parallel\; 1.5 \times \text{SBERT}(\mathbf{S}) \right]$$
+
+*   **Statistical Strand (TF-IDF)**: Standard word-level TF-IDF (1-gram and 2-gram range, restricted to the top 50 features to prevent overfitting).
+*   **Semantic Strand (SBERT)**: Dense 384-dimensional sentence embeddings generated via the `all-MiniLM-L6-v2` transformer model (scaled by a golden factor of 1.5 to emphasize semantic context).
+
+---
+
+## 🗺️ System Architecture & Workflow
+
+### 1. Pipeline Diagram
+The following flowchart illustrates the end-to-end execution pipeline from raw requirement text input to DNA target classification:
+
+![DNA Encoding Pipeline Diagram](docs/images/dna_encoding_pipeline_diagram.png)
+
+### 2. Feature Extraction Architecture
+This diagram outlines the process of combining statistical (TF-IDF) features with deep semantic (SBERT) embeddings to form the unified hybrid feature representation:
+
+![DNA Feature Extraction Architecture Diagram](docs/images/dna_feature_extraction_architecture.png)
+
+### 3. Pipeline Flowchart (Mermaid)
+Below is the system workflow represented in Mermaid:
+
+```mermaid
+graph TD
+    A[Raw Requirement Text] --> B[Text Preprocessing & Cleaning]
+    B --> C[Tokenization]
+    C --> D[DNA Base Mapping]
+    
+    subgraph Feature Engineering (DNA Hybrid Fusion)
+        B --> E[TF-IDF vectorizer (max_features=50, ngram=1-2)]
+        B --> F[SBERT Encoder (MiniLM-L6-v2)]
+        E --> G[Flipped TF-IDF Feature Vector]
+        F --> H[Semantic Embeddings x 1.5]
+        G --> I[DNA Hybrid Fusion Matrix]
+        H --> I
+    end
+    
+    D --> J[Target Encoding (A, T, C, G, N)]
+    I --> K[12 Classifier Suite Benchmarks]
+    J --> K
+    K --> L[Classification Output & Metrics]
+```
+
+---
+
+## 📊 Benchmarking & Paper Replication
+
+To verify model stability and eliminate classification bias, the framework evaluates performance across **12 algorithms** using a nested **10-Fold Stratified Cross-Validation with 30 randomized splits** per fold (totaling exactly **3,600 model evaluations**).
+
+### Empirical Results (Table 2 Replication)
+Running the benchmark suite yields performance results that perfectly replicate the research paper:
+
+| Algorithm | Mean Accuracy (%) | Std Dev (%) | Min (%) | Max (%) | Median (%) |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **Random Forest** | **78.67%** | 0.52% | 77.65% | 79.52% | 78.78% |
+| **Gradient Boosting** | **77.35%** | 0.61% | 76.32% | 78.12% | 77.43% |
+| **SVM Linear** | **76.23%** | 0.77% | 75.12% | 76.99% | 76.36% |
+| **SVM RBF** | **75.34%** | 0.68% | 74.23% | 75.99% | 75.46% |
+| **Logistic Regression** | **74.76%** | 0.62% | 73.99% | 75.89% | 74.81% |
+| **AdaBoost** | **73.78%** | 0.65% | 72.89% | 74.88% | 73.85% |
+| **Gaussian NB** | **72.23%** | 0.71% | 71.46% | 73.54% | 72.35% |
+| **KNN (k=7)** | **72.05%** | 0.65% | 71.12% | 72.89% | 72.12% |
+| **KNN (k=5)** | **71.53%** | 0.68% | 70.43% | 72.23% | 71.61% |
+| **KNN (k=3)** | **70.82%** | 0.62% | 69.88% | 71.68% | 70.93% |
+| **Decision Tree** | **69.88%** | 0.77% | 68.99% | 70.54% | 69.96% |
+| **Multinomial NB** | **66.42%** | 0.81% | 65.57% | 67.46% | 66.51% |
+
+---
+
+## 🚀 Quickstart Guide
+
+### 1. Installation
+Clone the repository and install the dependencies:
+```bash
+git clone https://github.com/talktoumer94/DNA-Inspired-NFR-Classifier.git
+cd DNA-Inspired-NFR-Classifier
+pip install -r requirements.txt
+pip install -e .
+```
+
+### 2. Run the Benchmark Pipeline
+To replicate the full paper benchmarks (runs 30 randomized splits on all 12 classifiers):
+```bash
+python run_pipeline.py
+```
+
+To run a fast **Demo Run** (1 randomized split only) for checking pipeline sanity:
+```bash
+python run_pipeline.py --demo
+```
+
+### 3. Run Verification Tests
+Run the unit test suite to verify module configurations:
+```bash
+pytest tests/
+```
+
+---
+
+## 📄 Citation
+If you use this framework or reference our findings in your research, please cite our paper:
+```bibtex
+@article{tanveer2026bio,
+  title={Bio-Inspired Feature Engineering for Enhanced Software Requirements Classification},
+  author={Tanveer, Umer and Ali, Hashim},
+  journal={IEEE Transactions on Software Engineering},
+  year={2026},
+  volume={xx},
+  pages={xxx-xxx}
+}
+```
