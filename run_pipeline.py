@@ -12,6 +12,10 @@ def main():
     parser.add_argument("--out_dir", type=str, default="results", help="Directory to save classification results")
     args = parser.parse_args()
 
+    import sys
+    if sys.stdout.encoding.lower() != 'utf-8':
+        sys.stdout.reconfigure(encoding='utf-8')
+
     print("🧬 DNA-Inspired Requirements Classification Pipeline")
     print("=" * 60)
     
