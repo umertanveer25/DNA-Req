@@ -59,6 +59,30 @@ graph TD
     K --> L[Classification Output & Metrics]
 ```
 
+### 2. Original Paper Figures
+The following diagrams were extracted directly from the research paper to visually support the architecture:
+
+**Figure 1**
+![Paper Figure 1](docs/images/extracted_img_0.png)
+
+**Figure 2**
+![Paper Figure 2](docs/images/extracted_img_1.png)
+
+**Figure 3**
+![Paper Figure 3](docs/images/extracted_img_2.png)
+
+**Figure 4**
+![Paper Figure 4](docs/images/extracted_img_3.png)
+
+**Figure 5**
+![Paper Figure 5](docs/images/extracted_img_4.png)
+
+**Figure 6**
+![Paper Figure 6](docs/images/extracted_img_5.png)
+
+**Figure 7**
+![Paper Figure 7](docs/images/extracted_img_6.png)
+
 ---
 
 ## 📊 Benchmarking & Paper Replication
