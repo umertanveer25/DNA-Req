@@ -35,18 +35,8 @@ $$\mathbf{X}_{\text{hybrid}} = \left[ \text{TF-IDF}(\mathbf{S}) \;\parallel\; 1.
 
 ## 🗺️ System Architecture & Workflow
 
-### 1. Pipeline Diagram
-The following flowchart illustrates the end-to-end execution pipeline from raw requirement text input to DNA target classification:
-
-![DNA Encoding Pipeline Diagram](docs/images/dna_encoding_pipeline_diagram.png)
-
-### 2. Feature Extraction Architecture
-This diagram outlines the process of combining statistical (TF-IDF) features with deep semantic (SBERT) embeddings to form the unified hybrid feature representation:
-
-![DNA Feature Extraction Architecture Diagram](docs/images/dna_feature_extraction_architecture.png)
-
-### 3. Pipeline Flowchart (Mermaid)
-Below is the system workflow represented in Mermaid:
+### 1. Pipeline Flowchart (Mermaid)
+Below is the system workflow represented in Mermaid, illustrating the end-to-end execution pipeline from raw requirement text input to DNA target classification and Feature Engineering.
 
 ```mermaid
 graph TD
@@ -54,16 +44,16 @@ graph TD
     B --> C[Tokenization]
     C --> D[DNA Base Mapping]
     
-    subgraph Feature Engineering (DNA Hybrid Fusion)
-        B --> E[TF-IDF vectorizer (max_features=50, ngram=1-2)]
-        B --> F[SBERT Encoder (MiniLM-L6-v2)]
+    subgraph FeatureEngineering [Feature Engineering - DNA Hybrid Fusion]
+        B --> E[TF-IDF vectorizer max_features=50, ngram=1-2]
+        B --> F[SBERT Encoder MiniLM-L6-v2]
         E --> G[Flipped TF-IDF Feature Vector]
         F --> H[Semantic Embeddings x 1.5]
         G --> I[DNA Hybrid Fusion Matrix]
         H --> I
     end
     
-    D --> J[Target Encoding (A, T, C, G, N)]
+    D --> J[Target Encoding A, T, C, G, N]
     I --> K[12 Classifier Suite Benchmarks]
     J --> K
     K --> L[Classification Output & Metrics]
