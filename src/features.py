@@ -5,12 +5,12 @@ from src.preprocessor import TextPreprocessor
 
 def dna_mapping(nfr_type: str) -> str:
     """
-    DNA base mapping for software requirement classes (A, T, C, G, N).
+    DNA base mapping for software requirement classes.
     A: Functional (F)
     T: Usability (US)
     C: Security (SE)
     G: Performance (PE)
-    N: Others (Default)
+    N: Ambiguous/Unmapped Sequence (Default for minority classes)
     """
     nfr_type = str(nfr_type).strip().upper()
     mapping = {
