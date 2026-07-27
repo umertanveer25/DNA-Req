@@ -20,6 +20,7 @@ print("[+] Loading PROMISE dataset...")
 df = pd.read_csv('data/Promise_Dataset.csv')
 df['Type'] = df['Type'].str.strip()
 df['DNA_Target'] = df['Type'].apply(dna_mapping)
+df = df[df['DNA_Target'] != 'N'].copy()
 
 print("[+] Loading FNFC Dataset for Zero-Shot Evaluation...")
 df_test = pd.read_csv(r'C:\Users\umert\Downloads\FNFC.csv', encoding='ISO-8859-1')
@@ -27,6 +28,7 @@ text_col = 'Requirement' if 'Requirement' in df_test.columns else df_test.column
 label_col = 'Type' if 'Type' in df_test.columns else ('Class' if 'Class' in df_test.columns else df_test.columns[1])
 df_test[label_col] = df_test[label_col].astype(str).str.strip()
 df_test['DNA_Target'] = df_test[label_col].apply(dna_mapping)
+df_test = df_test[df_test['DNA_Target'] != 'N'].copy()
 
 print("[+] Extracting TF-IDF + SBERT Features (Phase 1A: max_features=50, ngram_range=(1,3))...")
 ext = DNAFeatureExtractor(max_tfidf_features=50)
