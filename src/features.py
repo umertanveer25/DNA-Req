@@ -34,7 +34,7 @@ class DNAFeatureExtractor:
         self.tfidf_vectorizer = TfidfVectorizer(
             max_features=max_tfidf_features,
             stop_words='english',
-            ngram_range=(1, 2),
+            ngram_range=(1, 3),
             sublinear_tf=True
         )
 
