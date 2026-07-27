@@ -1,11 +1,12 @@
 import os, sys, numpy as np, pandas as pd
+from sklearn.model_selection import StratifiedKFold
+from sklearn.metrics import accuracy_score, f1_score
 from sklearn.svm import SVC
 from sklearn.linear_model import LogisticRegression
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, GradientBoostingClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.naive_bayes import MultinomialNB, GaussianNB
-from sklearn.metrics import accuracy_score, f1_score
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -15,23 +16,14 @@ sys.path.insert(0, '.')
 from src.features import dna_mapping, DNAFeatureExtractor
 
 print("[+] Loading PROMISE dataset...")
-df_train = pd.read_csv('data/Promise_Dataset.csv')
-df_train['Type'] = df_train['Type'].str.strip()
-df_train['DNA_Target'] = df_train['Type'].apply(dna_mapping)
-y_train = df_train['DNA_Target'].values
+df = pd.read_csv('data/Promise_Dataset.csv')
+df['Type'] = df['Type'].str.strip()
+df['DNA_Target'] = df['Type'].apply(dna_mapping)
 
-print("[+] Loading FNFC Dataset for Zero-Shot Evaluation...")
-df_test = pd.read_csv('C:/Users/umert/Downloads/FNFC.csv', encoding='ISO-8859-1')
-text_col = 'Requirement' if 'Requirement' in df_test.columns else df_test.columns[0]
-label_col = 'Type' if 'Type' in df_test.columns else ('Class' if 'Class' in df_test.columns else df_test.columns[1])
-df_test[label_col] = df_test[label_col].astype(str).str.strip()
-df_test['DNA_Target'] = df_test[label_col].apply(dna_mapping)
-y_test = df_test['DNA_Target'].values
-
-print("[+] Extracting DNA Features (TF-IDF + SBERT)...")
+print("[+] Extracting TF-IDF Features (Phase 0 - No SBERT)...")
 ext = DNAFeatureExtractor()
-X_train = ext.fit_transform(df_train['Requirement'].tolist())
-X_test = ext.transform(df_test[text_col].tolist())
+X = ext.fit_transform(df['Requirement'].tolist())
+y = df['DNA_Target'].values
 
 algorithms = {
     "SVM RBF": SVC(kernel='rbf', C=10, gamma='scale', random_state=42),
@@ -48,19 +40,23 @@ algorithms = {
     "Naive Bayes": GaussianNB()
 }
 
-print(f"\n[+] Testing 12 Algorithms on {len(df_test)} unseen FNFC requirements...")
+print("\n[+] Testing 12 Algorithms on PROMISE (10-Fold CV)...")
 print("="*60)
 print(f"{'Algorithm':<25} | {'Accuracy':<12} | {'Macro F1':<12}")
 print("="*60)
 
+skf = StratifiedKFold(n_splits=10, shuffle=True, random_state=42)
+
 for name, clf in algorithms.items():
-    # GaussianNB doesn't support sparse matrices if TF-IDF is used, but DNAFeatureExtractor returns dense arrays
+    accs, f1s = [], []
     try:
-        clf.fit(X_train, y_train)
-        preds = clf.predict(X_test)
-        acc = accuracy_score(y_test, preds) * 100
-        f1 = f1_score(y_test, preds, average='macro', zero_division=0) * 100
-        print(f"{name:<25} | {acc:>10.2f}% | {f1:>10.2f}%", flush=True)
+        for tr, val in skf.split(X, y):
+            clf.fit(X[tr], y[tr])
+            preds = clf.predict(X[val])
+            accs.append(accuracy_score(y[val], preds))
+            f1s.append(f1_score(y[val], preds, average='macro', zero_division=0))
+            
+        print(f"{name:<25} | {np.mean(accs)*100:>10.2f}% | {np.mean(f1s)*100:>10.2f}%", flush=True)
     except Exception as e:
         print(f"{name:<25} | Error: {str(e)[:40]}")
 

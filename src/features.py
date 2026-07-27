@@ -26,7 +26,7 @@ class DNAFeatureExtractor:
     Extracts hybrid features by fusing statistical (TF-IDF) and 
     deep semantic (SBERT) representations.
     """
-    def __init__(self, max_tfidf_features=50, sbert_model_name='all-MiniLM-L6-v2'):
+    def __init__(self, max_tfidf_features=2000, sbert_model_name='all-MiniLM-L6-v2'):
         """
         Initializes the TF-IDF vectorizer and SBERT model.
         """
@@ -34,7 +34,7 @@ class DNAFeatureExtractor:
         self.tfidf_vectorizer = TfidfVectorizer(
             max_features=max_tfidf_features,
             stop_words='english',
-            ngram_range=(1, 2),
+            ngram_range=(1, 3),
             sublinear_tf=True
         )
 
@@ -55,12 +55,8 @@ class DNAFeatureExtractor:
         # 1. Extract TF-IDF Statistical features
         tfidf_features = self.tfidf_vectorizer.transform(cleaned_texts).toarray()
         
-        # 2. Extract SBERT Semantic features
-        sbert_embeddings = self.sbert_model.encode(cleaned_texts, show_progress_bar=False)
-        
-        # 3. DNA Hybrid Fusion (Concatenate TF-IDF and SBERT)
-        X_hybrid = np.hstack((tfidf_features, sbert_embeddings * 1.5))
-        return X_hybrid
+        # Phase 0: Pure TF-IDF (No SBERT)
+        return tfidf_features
 
     def fit_transform(self, texts: list) -> np.ndarray:
         """
