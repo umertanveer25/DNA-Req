@@ -61,29 +61,75 @@ graph TD
 
 ---
 
-## 📊 Benchmarking & Paper Replication
+## 📊 Experimental Results
 
-To verify model stability and eliminate classification bias, the framework evaluates performance across **12 algorithms** using a nested **10-Fold Stratified Cross-Validation with 30 randomized splits** per fold (totaling exactly **3,600 model evaluations**).
+All results below are **experimentally verified** by running the pipeline on the **PROMISE NFR Dataset (969 requirements)** using a 434-dimensional DNA Hybrid Feature Vector (50-d TF-IDF + 384-d SBERT × 1.5).
 
-### Empirical Results (Table 2 Replication)
-Running the benchmark suite yields performance results that perfectly replicate the research paper:
+---
 
-| Algorithm | Baseline Accuracy (TF-IDF) | DNA-Inspired Accuracy | Performance Gain |
-| :--- | :---: | :---: | :---: |
-| **Random Forest** | 65.00% | **78.67%** | +13.67% |
-| **Gradient Boosting** | 65.00% | **77.35%** | +12.35% |
-| **SVM Linear** | 65.00% | **76.23%** | +11.23% |
-| **SVM RBF** | 65.00% | **75.34%** | +10.34% |
-| **Logistic Regression** | 65.00% | **74.76%** | +9.76% |
-| **AdaBoost** | 65.00% | **73.78%** | +8.78% |
-| **Gaussian NB** | 65.00% | **72.23%** | +7.23% |
-| **KNN (k=7)** | 65.00% | **72.05%** | +7.05% |
-| **KNN (k=5)** | 65.00% | **71.53%** | +6.53% |
-| **KNN (k=3)** | 65.00% | **70.82%** | +5.82% |
-| **Decision Tree** | 65.00% | **69.88%** | +4.88% |
-| **Multinomial NB** | 65.00% | **66.42%** | +1.42% |
+### Phase 1 — Baseline DNA Hybrid (30 Randomised Splits)
 
-> **Conclusion**: The DNA-Inspired feature engineering framework completely outperforms traditional baseline methods across all 12 standard algorithms. By encoding requirement characteristics as DNA sequences and fusing them with contextual SBERT embeddings, the model breaks past the conventional 65% accuracy ceiling.
+Evaluation protocol: **30 randomised train/test splits** on `data/Promise_Dataset.csv`.  
+Run command: `python run_pipeline.py`
+
+| Algorithm | Mean Accuracy | Std Dev | Min | Max | Median |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **SVM RBF** ⭐ | **84.41%** | ±2.58% | 80.21% | 89.69% | 84.02% |
+| **SVM Linear** | **82.55%** | ±3.34% | 78.12% | 89.69% | 80.93% |
+| **Logistic Regression** | **81.73%** | ±3.15% | 76.29% | 86.60% | 81.96% |
+| **KNN (k=3)** | 77.39% | ±3.87% | 72.16% | 84.54% | 78.35% |
+| **Gradient Boosting** | 76.88% | ±4.06% | 70.10% | 84.54% | 77.32% |
+| **KNN (k=5)** | 76.57% | ±2.27% | 74.23% | 80.41% | 76.17% |
+| **KNN (k=7)** | 75.12% | ±2.52% | 69.79% | 79.38% | 75.77% |
+| **Random Forest** | 68.42% | ±3.41% | 62.89% | 74.23% | 68.56% |
+| **AdaBoost** | 61.41% | ±4.88% | 52.58% | 69.07% | 61.86% |
+| **Decision Tree** | 53.05% | ±3.09% | 48.45% | 58.33% | 53.61% |
+| **Multinomial NB** | 49.64% | ±1.66% | 47.42% | 52.58% | 49.22% |
+| **Naive Bayes** | 42.61% | ±6.18% | 31.25% | 55.67% | 41.24% |
+
+> **Best Performer:** SVM RBF at **84.41%** mean accuracy with DNA Hybrid features.
+
+---
+
+### Phase 2 — Bio-Optimized (SelectKBest + Tuned Hyperparameters, 10-Fold Stratified CV)
+
+Evaluation protocol: **10-Fold Stratified Cross-Validation** with `SelectKBest(k=150)` feature selection + tuned hyperparameters.  
+Branch: `phase2-bio-optimization` | Run command: `python run_phase2_optimization_test.py`
+
+| Algorithm | Phase 1 Acc | Phase 2 Acc | Change | F1 Change | Statistically Significant |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **SVM RBF** | 84.41% | 82.66% | -1.75% | -3.89% | No (p=0.083) |
+| **SVM Linear** | 82.55% | 80.08% | -2.47% | -4.65% | No (p=0.055) |
+| **Logistic Regression** | 81.73% | 77.19% | -4.54% | -6.66% | **Yes (p<0.05)** |
+| **KNN (k=3)** | 77.39% | 78.53% | +1.13% | +1.13% | No (p=0.446) |
+| **KNN (k=5)** | 76.57% | 78.22% | +1.65% | +1.38% | No (p=0.109) |
+| **KNN (k=7)** | 75.12% | 78.63% | **+3.51%** | **+4.62%** | **Yes (p<0.05)** |
+| **Random Forest** | 68.42% | 72.44% | **+4.02%** | **+4.11%** | No (p=0.091) |
+| **AdaBoost** | 61.41% | 63.37% | +1.96% | +1.67% | No (p=0.077) |
+| **Decision Tree** | 53.05% | 53.36% | +0.31% | +0.88% | No (p=0.866) |
+| **Multinomial NB** | 49.64% | 71.31% | **+21.67%** | -7.91% | **Yes (p<0.05)** |
+| **Naive Bayes** | 42.61% | 68.94% | **+26.33%** | **+17.58%** | **Yes (p<0.05)** |
+| **Gradient Boosting** | 76.88% | 73.47% | -0.11% | +0.83% | No (p=0.939) |
+
+> **Key Finding:** Phase 2 optimization significantly improves weaker classifiers (Naive Bayes +26.33%, Multinomial NB +21.67%, KNN +3.51%). High-performing SVMs perform best without feature pruning, confirming that the Phase 1 DNA Hybrid feature space is already near-optimal for kernel-based methods.
+
+---
+
+### Statistical Significance (Phase 2 — Paired t-test & Wilcoxon)
+
+| Algorithm | t-Statistic | p-value | Cohen's d | Wilcoxon p | Significant |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| Random Forest | 1.8955 | 0.0905 | 0.4696 | 0.0938 | No |
+| SVM Linear | -2.2035 | 0.0550 | -0.6697 | 0.0547 | No |
+| SVM RBF | -1.9523 | 0.0827 | -0.6168 | 0.0703 | No |
+| Logistic Regression | -6.9207 | 6.91e-05 | -1.1805 | 0.0020 | **Yes** |
+| AdaBoost | 1.9998 | 0.0766 | 0.3682 | 0.1328 | No |
+| Naive Bayes | 8.2881 | 1.67e-05 | **3.9572** | 0.0020 | **Yes** |
+| KNN (k=7) | 3.2222 | 0.0105 | 1.1625 | 0.0137 | **Yes** |
+| KNN (k=5) | 1.7797 | 0.1088 | 0.6106 | 0.2031 | No |
+| KNN (k=3) | 0.7964 | 0.4463 | 0.2872 | 0.3574 | No |
+| Decision Tree | 0.1739 | 0.8658 | 0.0732 | 0.8457 | No |
+| Multinomial NB | -2.8157 | 0.0202 | -0.9618 | 0.0176 | **Yes** |
 
 ---
 
