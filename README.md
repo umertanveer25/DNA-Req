@@ -7,7 +7,7 @@
 
 A production-grade, bio-inspired machine learning framework that implements the exact methodology described in the research paper **"Bio-Inspired Feature Engineering for Enhanced Software Requirements Classification"**. 
 
-This repository leverages biological metaphors by mapping software requirement classes into genetic DNA bases (A, T, C, G, N) and constructing a hybrid feature space fusing statistical TF-IDF keyword metrics with deep contextual SBERT sentence embeddings.
+This repository leverages biological metaphors by mapping software requirement classes into genetic DNA bases (A, T, C, G, N) and constructing a hybrid feature space fusing statistical TF-IDF keyword metrics with deep contextual SBERT sentence embeddings, optimized by bio-inspired meta-heuristic algorithms.
 
 ---
 
@@ -28,96 +28,53 @@ The input text space is transformed using a dual-strand vectorization approach:
 
 $$\mathbf{X}_{\text{hybrid}} = \left[ \text{TF-IDF}(\mathbf{S}) \;\parallel\; 1.5 \times \text{SBERT}(\mathbf{S}) \right]$$
 
-*   **Statistical Strand (TF-IDF)**: Standard word-level TF-IDF (1-gram and 2-gram range, restricted to the top 50 features to prevent overfitting).
+*   **Statistical Strand (TF-IDF)**: Standard word-level TF-IDF (DNA codon mappings, restricted to 98 features).
 *   **Semantic Strand (SBERT)**: Dense 384-dimensional sentence embeddings generated via the `all-MiniLM-L6-v2` transformer model (scaled by a golden factor of 1.5 to emphasize semantic context).
 
 ---
 
-## 🗺️ System Architecture & Workflow
+## 🗺️ Phase-wise System Architecture
 
-### 1. Pipeline Flowchart (Mermaid)
-Below is the system workflow represented in Mermaid, illustrating the end-to-end execution pipeline from raw requirement text input to DNA target classification and Feature Engineering.
+### 📊 Phase 1: Baseline Evaluation (Traditional Machine Learning)
+Phase 1 establishes the baseline performance using raw text representation methods and classic ML algorithms on the imbalanced PROMISE dataset. 
 
-```mermaid
-graph TD
-    A[Raw Requirement Text] --> B[Text Preprocessing & Cleaning]
-    B --> C[Tokenization]
-    C --> D[DNA Base Mapping]
-    
-    subgraph FeatureEngineering [Feature Engineering - DNA Hybrid Fusion]
-        B --> E[TF-IDF vectorizer max_features=50, ngram=1-2]
-        B --> F[SBERT Encoder MiniLM-L6-v2]
-        E --> G[Flipped TF-IDF Feature Vector]
-        F --> H[Semantic Embeddings x 1.5]
-        G --> I[DNA Hybrid Fusion Matrix]
-        H --> I
-    end
-    
-    D --> J[Target Encoding A, T, C, G, N]
-    I --> K[12 Classifier Suite Benchmarks]
-    J --> K
-    K --> L[Classification Output & Metrics]
-```
+* **Best Performer:** SVM RBF at **83.38%** Accuracy.
 
----
+### 🔬 Phase 2: Hybrid Fusion Architecture
+Phase 2 introduces the novel DNA + SBERT hybrid fusion architecture (482 dimensions). This acts as the unoptimized anchor for our bio-inspired selectors.
 
-## 📊 Phase 1: Baseline Evaluation (Imbalanced PROMISE)
+* **Fusion Baseline Performer:** SVM RBF at **86.61%** Accuracy.
 
-The framework evaluates performance across **12 algorithms** using a nested **10-Fold Stratified Cross-Validation with 30 randomized splits** per fold (totaling exactly **3,600 model evaluations**) on the pure, imbalanced PROMISE dataset (without SMOTE).
+### 🧬 Phase 2A - 2F: Bio-Inspired Feature Optimization (The Champion Phase)
+In the final phase, we mathematically optimize the 482-dimensional fusion space using 6 rigorous bio-inspired meta-heuristic algorithms across a massive **30-split x 10-fold Cross-Validation** (3,300 model runs per optimizer).
 
-### Baseline Accuracy (30x10 CV)
+#### 🏆 Ultimate Optimization Scoreboard (SVM RBF)
 
-| Rank | Algorithm | Baseline Accuracy | Baseline Macro F1 | Standard Deviation |
-| :---: | :--- | :---: | :---: | :---: |
-| 🥇 1 | **SVM RBF** | **83.38%** | **80.84%** | $\pm 3.12\%$ |
-| 🥈 2 | **SVM Linear** | **82.49%** | **79.71%** | $\pm 3.25\%$ |
-| 🥉 3 | **Logistic Regression** | **81.74%** | **79.03%** | $\pm 3.40\%$ |
-| 4 | **KNN (k=3)** | **77.23%** | **69.75%** | $\pm 3.85\%$ |
-| 5 | **KNN (k=5)** | **76.47%** | **68.97%** | $\pm 3.90\%$ |
-| 6 | **KNN (k=7)** | **75.36%** | **65.56%** | $\pm 4.02\%$ |
-| 7 | **Random Forest** | **68.79%** | **53.00%** | $\pm 4.20\%$ |
-| 8 | **AdaBoost** | **62.45%** | **50.74%** | $\pm 4.55\%$ |
-| 9 | **Decision Tree** | **53.13%** | **45.86%** | $\pm 4.80\%$ |
-| 10 | **Multinomial NB** | **49.65%** | **18.78%** | $\pm 2.10\%$ |
-| 11 | **Naive Bayes** | **43.81%** | **43.65%** | $\pm 4.95\%$ |
+| Phase | Optimizer Algorithm | Selected Features | 30-Split Avg Accuracy |
+| :---: | :--- | :---: | :---: |
+| **2A** | 🥇 **Genetic Algorithm (GA)** | **239 / 482** | **86.84%** |
+| **2C** | 🥈 **Ant Colony Optimization (ACO)** | 479 / 482 | 86.54% |
+| **2F** | 🥉 **Whale Optimization Algorithm (WOA)** | 244 / 482 | 85.50% |
+| **2E** | **Grey Wolf Optimizer (GWO)** | 257 / 482 | 85.42% |
+| **2D** | **Artificial Bee Colony (ABC)** | 240 / 482 | 85.31% |
+| **2B** | **Particle Swarm Optimization (PSO)** | 249 / 482 | 84.11% |
 
-> **Conclusion**: By restricting TF-IDF dimensionality to prevent feature drowning, and allowing SBERT semantic features to dominate the input space, the SVM algorithms successfully cross the 80% ceiling without requiring any synthetic data balancing (SMOTE).
-
-### Baseline SVM RBF Plots (PROMISE Test Split)
-
-| Confusion Matrix (PROMISE) | ROC AUC (PROMISE) |
-|:---:|:---:|
-| ![CM PROMISE](plots/cm_promise.png) | ![ROC PROMISE](plots/roc_promise.png) |
+> **Conclusion**: The **Genetic Algorithm (Phase 2A)** is the absolute undisputed champion of feature selection for this architecture. By discarding over 50% of the dead-weight features (dropping from 482 to 239 dims), it successfully pushes the SVM RBF accuracy to an all-time high of **86.84%** without requiring *any* synthetic data balancing (like SMOTE).
 
 ---
 
-## 🌍 Phase 1: Zero-Shot Generalizability (FNFC Dataset)
+## 🌍 Zero-Shot Generalizability (FNFC Dataset)
 
 To mathematically prove that the DNA-inspired extractor is capturing underlying semantic principles rather than just memorizing the PROMISE dataset, we performed a strict **zero-shot cross-dataset evaluation**. 
 
-The 12 models were trained purely on the 969 PROMISE requirements, and tested blind on **7,060 totally unseen FNFC requirements**.
+The models were trained purely on the 969 PROMISE requirements, and tested blind on **7,060 totally unseen FNFC requirements**.
 
 | Rank | Algorithm | Accuracy | Macro F1 | Notes |
 | :---: | :--- | :---: | :---: | :--- |
 | 🥇 1 | **SVM RBF** | **77.58%** | **52.89%** | Best overall balance. Retains strong semantic generalization. |
 | 🥈 2 | **Logistic Regression** | **76.93%** | **52.45%** | Highly robust semantic generalization. |
-| 🥉 3 | **SVM Linear** | **72.72%** | **47.10%** | Solid performance on unseen domains. |
-| 4 | **Random Forest** | **83.27%** | **45.06%** | Highest Accuracy, lower F1. |
-| 5 | **Gradient Boosting** | **77.88%** | **43.68%** | Great accuracy, moderate F1. |
-| 6 | **KNN (k=7)** | **70.20%** | **40.77%** | - |
-| 7 | **KNN (k=3)** | **68.65%** | **39.68%** | - |
-| 8 | **KNN (k=5)** | **69.72%** | **39.40%** | - |
-| 9 | **AdaBoost** | **65.18%** | **37.61%** | - |
-| 10 | **Decision Tree** | **48.10%** | **24.67%** | Overfits to training space, fails to generalize. |
-| 11 | **Naive Bayes (Gaussian)**| **19.59%** | **17.44%** | Fails on dense SBERT vector spaces. |
 
 > **Conclusion**: Maintaining nearly 78% accuracy on a completely foreign dataset measuring 7,060 requirements demonstrates that the DNA feature extractor is robust to extreme domain shift and varying vocabulary.
-
-### Generalizability SVM RBF Plots (FNFC Dataset)
-
-| Confusion Matrix (FNFC) | ROC AUC (FNFC) |
-|:---:|:---:|
-| ![CM FNFC](plots/cm_fnfc.png) | ![ROC FNFC](plots/roc_fnfc.png) |
 
 ---
 
@@ -132,15 +89,15 @@ pip install -r requirements.txt
 pip install -e .
 ```
 
-### 2. Run the Phase 1 Evaluations
-To run zero-shot evaluations on FNFC:
+### 2. Run the Bio-Optimized Phases
+To run the winning Genetic Algorithm (Phase 2A) on all 11 classifiers:
 ```bash
-python evaluate_fnfc_all.py
+python run_30_splits_phase2A.py
 ```
 
-To generate baseline and generalizability plots:
+To run the Whale Optimization Algorithm (Phase 2F):
 ```bash
-python generate_plots.py
+python run_30_splits_phase2F.py
 ```
 
 ---
@@ -152,8 +109,6 @@ If you use this framework or reference our findings in your research, please cit
   title={Bio-Inspired Feature Engineering for Enhanced Software Requirements Classification},
   author={Tanveer, Umer and Ali, Hashim},
   journal={IEEE Transactions on Software Engineering},
-  year={2026},
-  volume={xx},
-  pages={xxx-xxx}
+  year={2026}
 }
 ```
