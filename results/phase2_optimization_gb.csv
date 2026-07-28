@@ -1,0 +1,2 @@
+Algorithm,Baseline_Acc,Phase2_Opt_Acc,Acc_Change,Baseline_F1,Phase2_Opt_F1,F1_Change,Stat_Significant
+Gradient Boosting,73.58%,73.47%,-0.11%,61.23%,62.06%,+0.83%,NO (p >= 0.05)

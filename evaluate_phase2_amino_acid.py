@@ -33,7 +33,7 @@ sample_dna = ext._translate([sample_text])[0]
 print(f"Sample English : {sample_text}")
 print(f"Sample DNA Seq : {sample_dna}")
 
-print("\n[+] 1. Testing Phase 3 (Amino Acid Encoding) on PROMISE (10-Fold CV)...")
+print("\n[+] 1. Testing Phase 2 (Amino Acid Encoding) on PROMISE (10-Fold CV)...")
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.ensemble import AdaBoostClassifier, GradientBoostingClassifier
 from sklearn.tree import DecisionTreeClassifier

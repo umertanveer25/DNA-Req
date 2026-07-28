@@ -1,15 +1,15 @@
-# run_30_splits_phase3D.py
-"""Phase 3-D: Artificial Bee Colony (ABC) feature selection + 11 classifiers."""
+# run_30_splits_phase2D.py
+"""Phase 2-D: Artificial Bee Colony (ABC) feature selection + 11 classifiers."""
 import sys, time, numpy as np
 sys.path.insert(0, '.')
-from run_phase3_common import load_and_encode, get_or_create_splits, run_evaluation, print_results
+from run_phase2_common import load_and_encode, get_or_create_splits, run_evaluation, print_results
 from src.optimizers.abc_selector import ABCFeatureSelector
 
 def main():
     X, y = load_and_encode()
     splits = get_or_create_splits(y)
 
-    print("\n[+] Phase 3-D: Running ABC Feature Selection...")
+    print("\n[+] Phase 2-D: Running ABC Feature Selection...")
     t0 = time.time()
     selector = ABCFeatureSelector(colony_size=30, iterations=10, random_state=42)
     mask = selector.select_features(X, y)
@@ -24,8 +24,8 @@ def main():
     results = run_evaluation(X_opt, y, splits)
     elapsed = time.time() - t1
 
-    print_results("Phase 3-D (ABC)", "Artificial Bee Colony", results,
-                  "results/phase3D_abc_results.csv", elapsed)
+    print_results("Phase 2-D (ABC)", "Artificial Bee Colony", results,
+                  "results/phase2D_abc_results.csv", elapsed)
 
 if __name__ == "__main__":
     main()

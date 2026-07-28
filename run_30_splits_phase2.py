@@ -87,7 +87,7 @@ df['Type'] = df['Type'].str.strip()
 df['Target'] = df['Type'].apply(dna_mapping_5class)
 y = df['Target'].values
 
-print("[+] Running Phase 3 Encoder: English to Amino Acid Codons (98 Dimensions)...")
+print("[+] Running Phase 2 Encoder: English to Amino Acid Codons (98 Dimensions)...")
 ext = TextToDNAEncoder(n_gram=3, max_features=98)
 X_codons = ext.fit_transform(df['Requirement'].tolist(), df['Target'].tolist())
 
@@ -96,7 +96,7 @@ sbert = SentenceTransformer('all-MiniLM-L6-v2')
 X_sbert = sbert.encode(df['Requirement'].tolist(), show_progress_bar=False)
 
 X = np.hstack((X_codons, X_sbert * 1.5))
-print(f"[+] Final Phase 3 Fusion Matrix Shape: {X.shape} (Matches exactly 482 dimensions!)")
+print(f"[+] Final Phase 2 Fusion Matrix Shape: {X.shape} (Matches exactly 482 dimensions!)")
 
 algorithms = {
     "SVM RBF": SVC(kernel='rbf', C=10, gamma='scale'),
@@ -131,7 +131,7 @@ def run_split(split_idx):
             split_res[name] = 0.0
     return split_res
 
-print("\n[+] Running Phase 3 (Amino Acids + SBERT) 10-Fold CV across 30 Randomized Splits (PARALLEL MODE)...")
+print("\n[+] Running Phase 2 (Amino Acids + SBERT) 10-Fold CV across 30 Randomized Splits (PARALLEL MODE)...")
 import time
 start_time = time.time()
 
@@ -147,7 +147,7 @@ for res in results_list:
 
 print(f"\n[+] Completed 30 Randomized Splits in {time.time() - start_time:.2f} seconds!", flush=True)
 print("="*80, flush=True)
-print(f"{'Algorithm':<25} | {'Phase 3 (30-Split Average)':<30}", flush=True)
+print(f"{'Algorithm':<25} | {'Phase 2 (30-Split Average)':<30}", flush=True)
 print("="*80, flush=True)
 
 final_averages = {}

@@ -1,4 +1,4 @@
-Algorithm,Phase 3-D (ABC)_Accuracy
+Algorithm,Phase 2-D (ABC)_Accuracy
 SVM RBF,85.31099656357388
 Logistic Regression,83.03028350515463
 KNN (k=3),82.50808991981673

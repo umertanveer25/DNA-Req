@@ -1,4 +1,4 @@
-# src/phase3_base.py
+# src/phase2_base.py
 """Common utilities for Phase 3 (codon + SBERT) pipelines.
 
 This module provides:

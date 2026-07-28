@@ -1,9 +1,9 @@
-# run_phase3_common.py
-"""Shared utilities for Phase 3-A through 3-F optimizer comparison scripts.
+# run_phase2_common.py
+"""Shared utilities for Phase 2-A through 3-F optimizer comparison scripts.
 
 This module provides:
   - load_and_encode()  - loads PROMISE dataset, encodes to 482-dim fusion matrix
-  - ALGORITHMS         - the exact 11 classifiers from the baseline Phase 3 script
+  - ALGORITHMS         - the exact 11 classifiers from the baseline Phase 2 script
   - get_or_create_splits() - reproducible 30-split x 10-fold CV partitions
   - run_evaluation()   - parallel 30-split evaluation returning per-algorithm averages
   - print_results()    - formatted table output + CSV export + baseline comparison
@@ -36,7 +36,7 @@ from src.preprocessor import TextPreprocessor
 BASELINE_SVM_RBF = 86.61  # from baseline_output.txt
 
 # ---------------------------------------------------------------------------
-# The exact 11 algorithms from run_30_splits_phase3.py (baseline)
+# The exact 11 algorithms from run_30_splits_phase2.py (baseline)
 # ---------------------------------------------------------------------------
 def get_algorithms():
     """Return fresh (unfitted) copies of the 11 baseline classifiers."""
@@ -136,7 +136,7 @@ def load_and_encode():
     X_sbert = sbert.encode(df['Requirement'].tolist(), show_progress_bar=False)
 
     X = np.hstack((X_codons, X_sbert * 1.5))
-    print(f"[+] Final Phase 3 Fusion Matrix: {X.shape} (482 dimensions)")
+    print(f"[+] Final Phase 2 Fusion Matrix: {X.shape} (482 dimensions)")
     return X, y
 
 

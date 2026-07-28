@@ -1,15 +1,15 @@
-# run_30_splits_phase3B.py
-"""Phase 3-B: Particle Swarm Optimization (PSO) feature selection + 11 classifiers."""
+# run_30_splits_phase2B.py
+"""Phase 2-B: Particle Swarm Optimization (PSO) feature selection + 11 classifiers."""
 import sys, time, numpy as np
 sys.path.insert(0, '.')
-from run_phase3_common import load_and_encode, get_or_create_splits, run_evaluation, print_results
+from run_phase2_common import load_and_encode, get_or_create_splits, run_evaluation, print_results
 from src.optimizers.pso_selector import PSOFeatureSelector
 
 def main():
     X, y = load_and_encode()
     splits = get_or_create_splits(y)
 
-    print("\n[+] Phase 3-B: Running PSO Feature Selection...")
+    print("\n[+] Phase 2-B: Running PSO Feature Selection...")
     t0 = time.time()
     selector = PSOFeatureSelector(swarm_size=30, iterations=10, random_state=42)
     mask = selector.select_features(X, y)
@@ -24,8 +24,8 @@ def main():
     results = run_evaluation(X_opt, y, splits)
     elapsed = time.time() - t1
 
-    print_results("Phase 3-B (PSO)", "Particle Swarm Optimization", results,
-                  "results/phase3B_pso_results.csv", elapsed)
+    print_results("Phase 2-B (PSO)", "Particle Swarm Optimization", results,
+                  "results/phase2B_pso_results.csv", elapsed)
 
 if __name__ == "__main__":
     main()

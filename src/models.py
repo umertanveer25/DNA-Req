@@ -59,3 +59,9 @@ def get_paper_classifiers(random_state=42):
         ),
         "Multinomial NB": MultinomialNB()
     }
+def get_classifier_dict(random_state=42):
+    """Compatibility wrapper returning the classifier dictionary.
+    The Phase 3‑A script expects a function named ``get_classifier_dict``;
+    internally it simply forwards to ``get_paper_classifiers``.
+    """
+    return get_paper_classifiers(random_state)

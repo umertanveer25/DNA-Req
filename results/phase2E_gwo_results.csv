@@ -1,4 +1,4 @@
-Algorithm,Phase 3-E (GWO)_Accuracy
+Algorithm,Phase 2-E (GWO)_Accuracy
 SVM RBF,85.42464919816722
 Logistic Regression,83.23997709049254
 KNN (k=5),80.93116408934708
