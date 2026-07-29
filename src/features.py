@@ -73,7 +73,7 @@ class CanonicalDNAEncoder(BaseEstimator, TransformerMixin):
                 
         if self.sublinear_tf:
             with np.errstate(divide='ignore'):
-            X = np.where(X > 0, 1.0 + np.log(X), 0.0)
+                X = np.where(X > 0, 1.0 + np.log(X), 0.0)
             
         # L2 normalize feature vectors
         norms = np.linalg.norm(X, axis=1, keepdims=True)
