@@ -13,7 +13,8 @@ from src.utils.seed_manager import get_reproducible_classifiers
 
 print("="*80)
 print("Phase 3 Reproducibility Script [TRUE LEAK-FREE DOMAIN ADAPTATION]")
-print("Evaluation: 10-Fold CV (1 Split due to extreme GPU computation time)")
+print("Optimization: BatchHardTripletLoss (Lightning Fast)")
+print("Evaluation: 10-Fold CV (Academic Standard)")
 print("="*80)
 
 # Load data
@@ -28,6 +29,7 @@ algorithms = get_reproducible_classifiers()
 skf = StratifiedKFold(n_splits=10, shuffle=True, random_state=42)
 
 results = {algo: [] for algo in algorithms}
+label_to_int = {'A': 0, 'T': 1, 'C': 2, 'G': 3, 'N': 4}
 
 for fold, (tr_idx, val_idx) in enumerate(skf.split(texts, y)):
     print(f"\n[+] Running Fold {fold+1}/10...")
@@ -37,20 +39,20 @@ for fold, (tr_idx, val_idx) in enumerate(skf.split(texts, y)):
     X_text_val = [texts[i] for i in val_idx]
     y_val = [y[i] for i in val_idx]
     
-    print("    [+] Fine-tuning SBERT strictly on Training Fold (No Data Leakage)...")
+    print("    [+] Fine-tuning SBERT via BatchHardTripletLoss (No Data Leakage)...")
     model = SentenceTransformer('pritamdeka/S-PubMedBert-MS-MARCO')
     
-    # Create training examples
+    # Create single-sentence training examples (NO combinatorial explosion)
     train_examples = []
     for i in range(len(X_text_tr)):
-        for j in range(i+1, len(X_text_tr)):
-            label = 1.0 if y_tr[i] == y_tr[j] else 0.0
-            train_examples.append(InputExample(texts=[X_text_tr[i], X_text_tr[j]], label=label))
+        label_int = label_to_int[y_tr[i]]
+        train_examples.append(InputExample(texts=[X_text_tr[i]], label=label_int))
             
-    train_dataloader = DataLoader(train_examples, shuffle=True, batch_size=16)
-    train_loss = losses.CosineSimilarityLoss(model)
+    # Batch size must be large enough to contain multiple classes for triplet mining
+    train_dataloader = DataLoader(train_examples, shuffle=True, batch_size=32)
+    train_loss = losses.BatchHardTripletLoss(model=model, distance_metric=losses.BatchHardTripletLossDistanceFunction.cosine_distance)
     
-    # Train for 1 epoch to save time, on GPU
+    # Train for 1 epoch
     model.fit(train_objectives=[(train_dataloader, train_loss)], epochs=1, warmup_steps=100, show_progress_bar=False)
     
     print("    [+] Generating Embeddings...")
