@@ -69,11 +69,24 @@ for fold, (tr_idx, val_idx) in enumerate(skf.split(texts, y)):
     X_tr_final = np.hstack((dna_tr, sbert_tr * 1.5))
     X_val_final = np.hstack((dna_val, sbert_val * 1.5))
     
+    from sklearn.preprocessing import MinMaxScaler
+    scaler = MinMaxScaler()
+    X_tr_scaled = scaler.fit_transform(X_tr_final)
+    X_val_scaled = scaler.transform(X_val_final)
+    
     print("    [+] Evaluating Classifiers...")
     for name, clf in algorithms.items():
-        clf.fit(X_tr_final, y_tr)
-        acc = clf.score(X_val_final, y_val)
-        results[name].append(acc)
+        try:
+            if name == "Multinomial NB":
+                clf.fit(X_tr_scaled, y_tr)
+                acc = clf.score(X_val_scaled, y_val)
+            else:
+                clf.fit(X_tr_final, y_tr)
+                acc = clf.score(X_val_final, y_val)
+            results[name].append(acc)
+        except Exception as e:
+            print(f"Algorithm {name} failed: {e}")
+            results[name].append(0.0)
 
 print("\n" + "="*80)
 print("FINAL RESULTS (True Leak-Free 10-Fold Averages)")
