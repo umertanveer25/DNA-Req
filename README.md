@@ -15,13 +15,14 @@ This repository leverages biological metaphors by mapping software requirement c
 
 The framework encodes linguistic requirement rules into DNA-like sequences to build robust feature maps:
 
-### 1. Symbolic DNA Base Target Mapping
-Classes from the **PROMISE NFR dataset** are mapped into genetic bases:
+### 1. The 4-Base Biological Mapping & IUPAC Ambiguity
+Classes from the **PROMISE NFR dataset** are mapped strictly into the 4 physical canonical DNA bases:
 *   **Adenine (A)**: Functional Requirements (F)
 *   **Thymine (T)**: Usability Requirements (US)
 *   **Guanine (G)**: Performance Requirements (PE)
 *   **Cytosine (C)**: Security Requirements (SE)
-*   **Neutral (N)**: All other Non-Functional Requirements (NFRs)
+
+To maintain strict biological accuracy during codon (3-gram) translation, the framework leverages the standard bioinformatics **IUPAC 'N' placeholder** to represent semantically ambiguous words or the remaining minority Non-Functional Requirements. This allows the construction of valid ambiguous sequences (e.g., `ANN`, `NNC`) at the translation level without fabricating a non-existent 5th base pair.
 
 ### 2. Hybrid DNA Feature Fusion
 The input text space is transformed using a dual-strand vectorization approach:
