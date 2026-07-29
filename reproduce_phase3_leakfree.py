@@ -5,7 +5,7 @@ import pandas as pd
 from sklearn.model_selection import StratifiedKFold
 from sentence_transformers import SentenceTransformer, InputExample, losses
 from torch.utils.data import DataLoader
-from src.features import CanonicalDNAEncoder
+from src.features import DNAEncoderTransformer
 import torch
 
 sys.path.insert(0, '.')
@@ -60,7 +60,7 @@ for fold, (tr_idx, val_idx) in enumerate(skf.split(texts, y)):
     sbert_val = model.encode(X_text_val, show_progress_bar=False)
     
     print("    [+] Building DNA Features...")
-    dna_encoder = CanonicalDNAEncoder(n_gram=3, max_features=98)
+    dna_encoder = DNAEncoderTransformer(n_gram=3, max_features=98)
     dna_encoder.fit(X_text_tr, y_tr)
     
     dna_tr = dna_encoder.transform(X_text_tr)
