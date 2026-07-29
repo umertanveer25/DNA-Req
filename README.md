@@ -41,21 +41,21 @@ This table demonstrates the strict evolution of the framework. We start with the
 
 Evaluated using rigorous **30 Randomized Splits of 10-Fold CV (3,300 total models)**.
 
-| Rank | Algorithm | Phase 0 (TF-IDF Baseline) | Phase 2 (Codons + SBERT) | Phase 3 (Codons + Domain-Adapted SBERT) |
+| Rank | Algorithm | Phase 0 (TF-IDF Baseline) | Phase 2 (Codons + SBERT) | Phase 3 (Strict 4-Base Codons + Domain-Adapted SBERT) |
 | :--- | :--- | :--- | :--- | :--- |
-| **1** | **SVM RBF** | ~74.50% | 86.61% | **90.59%** 🏆 |
-| **2** | **Logistic Regression** | ~73.10% | 84.74% | **89.68%** |
-| **3** | **SVM Linear** | ~72.85% | 82.68% | **88.04%** |
-| **4** | **KNN (k=7)** | ~70.15% | 80.76% | **87.23%** |
-| **5** | **KNN (k=5)** | ~69.40% | 81.46% | **86.52%** |
-| **6** | **KNN (k=3)** | ~68.90% | 82.22% | **86.49%** |
-| **7** | **Multinomial NB** | ~70.20% | 79.25% | **86.21%** |
-| **8** | **Random Forest** | ~73.90% | 78.64% | **84.78%** |
-| **9** | **AdaBoost** | ~65.10% | 70.91% | **76.62%** |
-| **10** | **Naive Bayes** | ~58.30% | 66.31% | **73.69%** |
-| **11** | **Decision Tree** | ~60.40% | 63.05% | **68.36%** |
+| **1** | **SVM RBF** | ~74.50% | 86.61% | **89.85%** 🏆 |
+| **2** | **Logistic Regression** | ~73.10% | 84.74% | **88.93%** |
+| **3** | **SVM Linear** | ~72.85% | 82.68% | **88.07%** |
+| **4** | **KNN (k=7)** | ~70.15% | 80.76% | **87.21%** |
+| **5** | **KNN (k=5)** | ~69.40% | 81.46% | **86.99%** |
+| **6** | **KNN (k=3)** | ~68.90% | 82.22% | **86.53%** |
+| **7** | **Multinomial NB** | ~70.20% | 79.25% | **86.27%** |
+| **8** | **Naive Bayes** | ~58.30% | 66.31% | **85.03%** |
+| **9** | **Random Forest** | ~73.90% | 78.64% | **84.63%** |
+| **10** | **AdaBoost** | ~65.10% | 70.91% | **76.79%** |
+| **11** | **Decision Tree** | ~60.40% | 63.05% | **68.16%** |
 
-> **Conclusion**: The framework achieves massive, statistically significant improvements across the board. The translation into Biological DNA Codons (Phase 2) created a massive jump. Fine-tuning the SBERT space strictly for the PROMISE domain geometry (Phase 3) completely broke the 90% barrier, pushing the **SVM RBF to an incredible 90.59%**.
+> **Conclusion**: The framework achieves massive, statistically significant improvements across the board. The translation into Biological DNA Codons (Phase 2) created a massive jump. Fine-tuning the SBERT space strictly for the PROMISE domain geometry, combined with the 100% rigorous 4-Base Biological encoding and IUPAC N-codon substitution (Phase 3), compresses the feature space massively down to just **431 dimensions** while pushing the SVM RBF to a state-of-the-art **89.85%**.
 
 ### 🧬 Phase 2A - 2F: Bio-Inspired Feature Optimization (The Champion Phase)
 In the final phase, we mathematically optimize the 482-dimensional fusion space using 6 rigorous bio-inspired meta-heuristic algorithms across a massive **30-split x 10-fold Cross-Validation** (3,300 model runs per optimizer).

@@ -1,4 +1,4 @@
-﻿import os, sys, numpy as np, pandas as pd
+import os, sys, numpy as np, pandas as pd
 from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import accuracy_score
 from sklearn.svm import SVC
@@ -24,9 +24,10 @@ def dna_mapping_5class(nfr_type):
 class TextToDNAEncoder:
     def __init__(self, n_gram=3, max_features=98):
         self.word_to_base = {}
+        self.word_is_ambiguous = {}
         self.codon_vectorizer = TfidfVectorizer(
-            analyzer='char',
-            ngram_range=(n_gram, n_gram),
+            analyzer='word',
+            ngram_range=(1, 1),
             max_features=max_features,
             sublinear_tf=True
         )
@@ -44,38 +45,65 @@ class TextToDNAEncoder:
                 class_word_counts[label][w] += 1
                 global_counts[w] += 1
                 
+        rng = np.random.RandomState(42)
+        canonical_bases = ['A', 'T', 'C', 'G']
+        
         for w, total in global_counts.items():
             if total < 3:
-                self.word_to_base[w] = 'N'
+                self.word_to_base[w] = rng.choice(canonical_bases)
+                self.word_is_ambiguous[w] = True
                 continue
             max_class = 'N'
             max_freq = 0
-            for cls in ['A', 'T', 'C', 'G']:
+            for cls in canonical_bases:
                 if class_word_counts[cls][w] > max_freq:
                     max_freq = class_word_counts[cls][w]
                     max_class = cls
             if (max_freq / total) < 0.5:
-                self.word_to_base[w] = 'N'
+                self.word_to_base[w] = rng.choice(canonical_bases)
+                self.word_is_ambiguous[w] = True
             else:
                 self.word_to_base[w] = max_class
+                self.word_is_ambiguous[w] = False
                 
-        dna_sequences = self._translate(texts)
-        self.codon_vectorizer.fit(dna_sequences)
+        codon_sequences = self._translate(texts)
+        self.codon_vectorizer.fit(codon_sequences)
         return self
 
     def _translate(self, texts):
-        dna_sequences = []
+        rng = np.random.RandomState(42)
+        canonical_bases = ['A', 'T', 'C', 'G']
+        codon_sequences = []
+        
         for text in texts:
             words = TextPreprocessor.clean_text(text).split()
-            sequence = "".join([self.word_to_base.get(w, 'N') for w in words])
-            if not sequence:
-                sequence = "N"
-            dna_sequences.append(sequence)
-        return dna_sequences
+            bases = []
+            ambiguous_mask = []
+            
+            for w in words:
+                if w in self.word_to_base:
+                    bases.append(self.word_to_base[w])
+                    ambiguous_mask.append(self.word_is_ambiguous[w])
+                else:
+                    bases.append(rng.choice(canonical_bases))
+                    ambiguous_mask.append(True)
+                    
+            codons = []
+            if len(bases) < 3:
+                codons.append("NNN")
+            else:
+                for i in range(len(bases) - 2):
+                    if any(ambiguous_mask[i:i+3]):
+                        codons.append("NNN")
+                    else:
+                        codons.append("".join(bases[i:i+3]))
+                        
+            codon_sequences.append(" ".join(codons))
+        return codon_sequences
 
     def transform(self, texts):
-        dna_sequences = self._translate(texts)
-        return self.codon_vectorizer.transform(dna_sequences).toarray()
+        codon_sequences = self._translate(texts)
+        return self.codon_vectorizer.transform(codon_sequences).toarray()
 
     def fit_transform(self, texts, labels):
         self.fit(texts, labels)
