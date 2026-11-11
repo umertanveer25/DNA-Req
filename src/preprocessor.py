@@ -3,12 +3,26 @@ import re
 class TextPreprocessor:
     """
     Standard preprocessor for requirement texts.
-    Cleans punctuation, normalizes spacing, and tokenizes text.
+    Provides dual-mode cleaning:
+    - normalize_for_transformer(): preserves casing and syntactic punctuation for SBERT.
+    - clean_text(): normalizes and cleans for statistical lexical analysis (TF-IDF).
+    - tokenize(): produces alphanumeric tokens for lexical/k-mer analysis.
     """
+    @staticmethod
+    def normalize_for_transformer(text: str) -> str:
+        """
+        Normalizes whitespace while preserving casing and sentence punctuation
+        to retain maximum contextual information for Transformer encoders (SBERT).
+        """
+        if not isinstance(text, str):
+            text = str(text)
+        return re.sub(r'\s+', ' ', text).strip()
+
     @staticmethod
     def clean_text(text: str) -> str:
         """
-        Cleans and normalizes the input text.
+        Cleans and normalizes input text for statistical TF-IDF vectorization.
+        Converts to lowercase and removes non-alphanumeric noise.
         """
         if not isinstance(text, str):
             text = str(text)

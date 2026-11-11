@@ -4,14 +4,29 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import GaussianNB, MultinomialNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
+from src.deep_models import HybridDeepSequenceClassifier
 
-def get_paper_classifiers(random_state=42):
+def get_proposed_sequence_model(random_state=42):
     """
-    Returns all 12 classifiers specified in the paper's benchmark table (Table 2).
-    Classifiers are configured with class_weight='balanced' where supported
-    to align with the paper's imbalanced dataset mitigation approach.
+    Returns the proposed Hybrid Deep Sequence Model with BiLSTM + Self-Attention.
+    Directly substantiates the PhD Thesis Title:
+    'An Effective Hybrid Sequence Model for Automated Software Requirement 
+     Classification Through Deep Representation Learning' (Synopsis [UT1], [UT2]).
     """
-    return {
+    return HybridDeepSequenceClassifier(
+        epochs=20,
+        batch_size=32,
+        hidden_dim=128,
+        dropout=0.3,
+        random_state=random_state
+    )
+
+def get_paper_classifiers(random_state=42, include_proposed_sequence_model=False):
+    """
+    Returns the classifiers specified in the paper's benchmark suite.
+    If include_proposed_sequence_model is True, appends the proposed BiLSTM-Attention model.
+    """
+    models = {
         "Random Forest": RandomForestClassifier(
             n_estimators=100,
             class_weight='balanced',
@@ -59,3 +74,8 @@ def get_paper_classifiers(random_state=42):
         ),
         "Multinomial NB": MultinomialNB()
     }
+    
+    if include_proposed_sequence_model:
+        models["Proposed Hybrid Sequence Model"] = get_proposed_sequence_model(random_state=random_state)
+        
+    return models

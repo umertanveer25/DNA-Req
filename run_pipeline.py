@@ -9,6 +9,7 @@ def main():
     parser = argparse.ArgumentParser(description="DNA-Inspired Software Requirements Classification Pipeline")
     parser.add_argument("--data_path", type=str, default="data/Promise_Dataset.csv", help="Path to PROMISE dataset")
     parser.add_argument("--demo", action="store_true", help="Run 1 split demo mode for fast verification")
+    parser.add_argument("--include_sequence_model", action="store_true", help="Include proposed BiLSTM-Attention Hybrid Sequence Model in benchmark")
     parser.add_argument("--out_dir", type=str, default="results", help="Directory to save classification results")
     args = parser.parse_args()
 
@@ -35,21 +36,30 @@ def main():
     print(df['DNA_Target'].value_counts())
     print("-" * 60)
     
-    # 2. Extract Features (DNA Fusion: TF-IDF + SBERT)
-    print("🧬 Extracting DNA Hybrid Features (TF-IDF + SBERT)...")
+    # 2. Extract SBERT Dense Embeddings (Inference-only, label-agnostic)
+    print("🧬 Pre-computing SBERT Semantic Embeddings (all-MiniLM-L6-v2)...")
     extractor = DNAFeatureExtractor()
-    X_hybrid = extractor.fit_transform(X_text)
-    print(f"✅ DNA Hybrid Feature Vector Dimension: {X_hybrid.shape[1]}")
+    sbert_embeddings = extractor.encode_sbert(X_text)
+    print(f"✅ SBERT Dense Representation: {sbert_embeddings.shape}")
+    print(f"✅ Target Hybrid Dimension per fold: 50 (Fold-isolated TF-IDF) + 384 (SBERT) = 434")
     print("-" * 60)
 
     # 3. Initialize Models
-    classifiers = get_paper_classifiers()
+    classifiers = get_paper_classifiers(include_proposed_sequence_model=args.include_sequence_model)
+    if args.include_sequence_model:
+        print("🧠 Proposed Hybrid Deep Sequence Model: ACTIVE (BiLSTM + Self-Attention)")
 
-    # 4. Run Benchmark
+    # 4. Run Benchmark with Strict Fold-Pure Isolation (Zero Data Leakage)
     evaluator = BenchmarkEvaluator(classifiers)
     num_splits = 1 if args.demo else 30
     
-    summary_df = evaluator.run_benchmark(X_hybrid, y, num_splits=num_splits)
+    summary_df = evaluator.run_benchmark(
+        texts=X_text,
+        y=y,
+        sbert_embeddings=sbert_embeddings,
+        extractor=extractor,
+        num_splits=num_splits
+    )
     
     print("\n" + "=" * 60)
     print("🏆 FINAL CLASSIFICATION BENCHMARK SUMMARY")

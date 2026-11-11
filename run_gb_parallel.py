@@ -1,16 +1,33 @@
-import os, sys, numpy as np, pandas as pd
-from scipy import stats
+import os, sys, multiprocessing, numpy as np, pandas as pd
 from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import accuracy_score, f1_score
 from sklearn.ensemble import GradientBoostingClassifier
 from joblib import Parallel, delayed
-import multiprocessing
+
+os.environ["LOKY_MAX_CPU_COUNT"] = str(multiprocessing.cpu_count())
+sys.path.insert(0, '.')
+from src.features import dna_mapping, DNAFeatureExtractor
 
 SEED, NUM_SPLITS, N_FOLDS = 42, 30, 10
+cache_X = 'results/X_features_cache.npy'
+cache_y = 'results/y_labels_cache.npy'
 
-print("[+] Loading Cached Features & Labels...", flush=True)
-X = np.load('results/X_features_cache.npy')
-y = np.load('results/y_labels_cache.npy', allow_pickle=True)
+# Ensure features are present
+if not os.path.exists(cache_X) or not os.path.exists(cache_y):
+    print("[+] Extracting and caching features for Gradient Boosting benchmark...")
+    df = pd.read_csv('data/Promise_Dataset.csv')
+    df['Type'] = df['Type'].str.strip()
+    df['DNA_Target'] = df['Type'].apply(dna_mapping)
+    ext = DNAFeatureExtractor(max_tfidf_features=50)
+    X = ext.fit_transform(df['Requirement'].tolist())
+    y = df['DNA_Target'].values
+    os.makedirs('results', exist_ok=True)
+    np.save(cache_X, X)
+    np.save(cache_y, y)
+else:
+    print("[+] Loading Cached Features & Labels...", flush=True)
+    X = np.load(cache_X)
+    y = np.load(cache_y, allow_pickle=True)
 
 def eval_split(s):
     clf = GradientBoostingClassifier(n_estimators=20, max_depth=3, random_state=SEED)
@@ -25,7 +42,7 @@ def eval_split(s):
 
 if __name__ == '__main__':
     print("[+] Starting Parallel Gradient Boosting Evaluation...", flush=True)
-    results = Parallel(n_jobs=-1, backend="loky", verbose=10)(
+    results = Parallel(n_jobs=-1, backend="loky", verbose=0)(
         delayed(eval_split)(s) for s in range(NUM_SPLITS)
     )
     
@@ -36,6 +53,6 @@ if __name__ == '__main__':
 
     mean_acc = np.mean(all_accs) * 100
     mean_f1 = np.mean(all_f1s) * 100
-    print("\n" + "="*60, flush=True)
+    print("\n" + "=" * 60, flush=True)
     print(f"Gradient Boosting Baseline (300 Folds): Accuracy = {mean_acc:.2f}% | Macro F1 = {mean_f1:.2f}%", flush=True)
-    print("="*60, flush=True)
+    print("=" * 60, flush=True)
