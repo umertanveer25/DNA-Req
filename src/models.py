@@ -21,10 +21,11 @@ def get_proposed_sequence_model(random_state=42):
         random_state=random_state
     )
 
-def get_paper_classifiers(random_state=42, include_proposed_sequence_model=False):
+def get_paper_classifiers(random_state=42, include_proposed_sequence_model=True):
     """
     Returns the classifiers specified in the paper's benchmark suite.
-    If include_proposed_sequence_model is True, appends the proposed BiLSTM-Attention model.
+    Defaults to include_proposed_sequence_model=True so the flagship PyTorch 
+    BiLSTM + Self-Attention Hybrid Sequence Model is always benchmarked alongside baselines.
     """
     models = {
         "Random Forest": RandomForestClassifier(

@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 from sklearn.base import clone
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from tqdm import tqdm
 
 class BenchmarkEvaluator:
@@ -74,6 +74,12 @@ class BenchmarkEvaluator:
                         nb_scaler = MinMaxScaler()
                         X_tr_clf = nb_scaler.fit_transform(X_tr)
                         X_te_clf = np.clip(nb_scaler.transform(X_te), 0.0, 1.0)
+                    elif name in ["SVM Linear", "SVM RBF", "KNN (k=3)", "KNN (k=5)", "KNN (k=7)", 
+                                  "Logistic Regression", "Proposed Hybrid Sequence Model"]:
+                        # Per Section 3.5 (Eq. 5), apply z-score normalization strictly on training fold
+                        std_scaler = StandardScaler()
+                        X_tr_clf = std_scaler.fit_transform(X_tr)
+                        X_te_clf = std_scaler.transform(X_te)
                     else:
                         X_tr_clf = X_tr
                         X_te_clf = X_te

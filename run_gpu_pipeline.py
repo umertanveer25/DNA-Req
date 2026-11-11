@@ -12,7 +12,7 @@ from sklearn.preprocessing import MinMaxScaler
 from tqdm import tqdm
 
 sys.path.insert(0, '.')
-from src.features import dna_mapping, DNAFeatureExtractor
+from src.features import normalize_promise_label, PROMISE_CLASSES, CLASS_DESCRIPTIONS, DNAFeatureExtractor
 from src.models import get_paper_classifiers, get_proposed_sequence_model
 
 def parse_args():
@@ -46,20 +46,22 @@ def main():
         
     df = pd.read_csv(args.data_path)
     df['Type'] = df['Type'].str.strip()
-    df['DNA_Target'] = df['Type'].apply(dna_mapping)
+    df['Canonical_Class'] = df['Type'].apply(normalize_promise_label)
     
     X_text = df['Requirement'].tolist()
-    y = df['DNA_Target'].values
+    y = df['Canonical_Class'].values
 
-    print(f"📊 Dataset loaded: {len(X_text)} requirements.")
-    print("📋 Class Distribution:")
-    for k, v in df['DNA_Target'].value_counts().items():
-        print(f"   Base {k}: {v} samples ({v/len(df)*100:.1f}%)")
+    print(f"📊 Dataset loaded: {len(X_text)} requirements across {len(PROMISE_CLASSES)} canonical classes.")
+    print("📋 Canonical 12-Class PROMISE Distribution (No 'N' class):")
+    for cls in PROMISE_CLASSES:
+        cnt = (y == cls).sum()
+        desc = CLASS_DESCRIPTIONS.get(cls, cls)
+        print(f"   {cls:2s} ({desc:16s}): {cnt:3d} ({cnt/len(y)*100:4.1f}%)")
     print("-" * 65)
 
     # 3. GPU-Accelerated SBERT Extraction
     print(f"🧬 Extracting Contextual SBERT Representations on {device.upper()}...")
-    extractor = DNAFeatureExtractor()
+    extractor = DNAFeatureExtractor(include_taxonomic_dna=True)
     extractor.sbert_model = extractor.sbert_model.to(device)
     
     # Batch encode on GPU
