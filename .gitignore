@@ -1,50 +1,7 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
-*$py.class
-
-# C extensions
-*.so
-
-# Distribution / packaging
-bin/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-
-# PyInstaller
-#  Usually these files are written by a python script, you want them not checked in
-*.manifest
-*.spec
-
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nosetypes
-.pytest_cache/
-.mypy_cache/
-.hypothesis/
-.run/
-
-# Jupyter Notebook
-.ipynb_checkpoints
+*.class
 
 # Environments
 .env
@@ -55,20 +12,41 @@ ENV/
 env.bak/
 venv.bak/
 
+# Testing & Cache
+.pytest_cache/
+.tox/
+.mypy_cache/
+htmlcov/
+.ipynb_checkpoints/
+
+# Ignore LaTeX paper, manuscript files, and compilation logs
+paper_manuscript.*
+Definitions/
+TSP_template.bib
+main.tex
+main.pdf
+*.aux
+*.out
+*.log
+*.pdf
+refs_*.json
+
 # Project data
 data/*.csv
 data/*.json
 !data/Promise_Dataset.csv
 results/
-*.png
-*.pdf
-*.log
 
-*.aux
-*.out
-refs_*.json
-paper_manuscript.*
-Definitions/
-TSP_template.bib
+# Ignore temporary plots/images by default, but track official publication figures
+*.png
 *.jpg
 *.jpeg
+!class_distribution.png
+!performance_comparison.png
+!confusion_matrix.png
+!roc_promise.png
+!algorithm_ranking.png
+!cm_fnfc.png
+!roc_fnfc.png
+!dna_pipeline_diagram.jpg
+!method_overview.jpg
