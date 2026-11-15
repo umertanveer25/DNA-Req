@@ -63,3 +63,12 @@ results/
 *.png
 *.pdf
 *.log
+
+*.aux
+*.out
+refs_*.json
+paper_manuscript.*
+Definitions/
+TSP_template.bib
+*.jpg
+*.jpeg
